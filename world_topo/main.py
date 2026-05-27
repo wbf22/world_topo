@@ -5,6 +5,7 @@ import tempfile
 import numpy as np
 import rasterio
 from matplotlib import rcParams, pyplot as plt
+from matplotlib import cm as mpl_cm
 
 from world_topo.fetch.dem import fetch_dem
 from world_topo.fetch.imagery import fetch_imagery
@@ -78,7 +79,13 @@ def make_elevation_map(lat, lon, width, height, output,
                     ax.imshow(np.transpose(rgb, (1, 2, 0)),
                               extent=img_extent, alpha=0.9)
 
-        shade = compute_hillshade(dem)
+        center_lat_rad = np.radians((bounds.top + bounds.bottom) / 2)
+        dlon = (bounds.right - bounds.left) / nx
+        dlat = (bounds.top - bounds.bottom) / ny
+        x_res = dlon * 111320 * np.cos(center_lat_rad)
+        y_res = dlat * 111320
+
+        shade = compute_hillshade(dem, resolution=(y_res, x_res))
         shade_alpha = 0.35 if imagery_path else 0.85
         ax.imshow(shade, extent=extent, cmap='gray', alpha=shade_alpha)
 
@@ -95,22 +102,6 @@ def make_elevation_map(lat, lon, width, height, output,
             center_lon = (bounds.left + bounds.right) / 2
             ax.set_title(f'Elevation Map ({center_lat:.4f}°, {center_lon:.4f}°)')
             plt.tight_layout()
-
-        if debug:
-            fig_dem, ax_dem = plt.subplots(1, 1, figsize=figsize)
-            ax_dem.imshow(dem, extent=extent, cmap='terrain',
-                          vmin=-500, vmax=9000)
-            ax_dem.set_title('DEM (raw)')
-            fig_dem.savefig(output.replace('.png', '_dem.png'), dpi=150,
-                            bbox_inches='tight')
-            plt.close(fig_dem)
-
-            fig_shade, ax_shade = plt.subplots(1, 1, figsize=figsize)
-            ax_shade.imshow(shade, extent=extent, cmap='gray')
-            ax_shade.set_title('Hillshade')
-            fig_shade.savefig(output.replace('.png', '_hillshade.png'), dpi=150,
-                              bbox_inches='tight')
-            plt.close(fig_shade)
 
         plt.savefig(output, dpi=150, bbox_inches='tight',
                     pad_inches=0 if clean else 0.1)
