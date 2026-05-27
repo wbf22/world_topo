@@ -26,8 +26,8 @@
             "args": [
                 "--lat", "40.511",
                 "--lon", "-112.258",
-                "--width", "0.08",
-                "--height", "0.08",
+                "--width", "0.5",
+                "--height", "0.5",
                 "--no-imagery",
                 "--clean",
                 "-o", "output.png"

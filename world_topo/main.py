@@ -59,7 +59,8 @@ def make_elevation_map(lat, lon, width, height, output,
                       file=sys.stderr)
 
         aspect_ratio = ny / nx
-        figsize = (12, 12 * aspect_ratio)
+        size=(12/0.1) * min(width, height)
+        figsize = (size, size * aspect_ratio)
         fig, ax = plt.subplots(1, 1, figsize=figsize)
 
         if imagery_path and os.path.exists(imagery_path):
