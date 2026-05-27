@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Generate Elevation Map",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "world_topo",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--lat", "46.85",
+                "--lon", "-121.76",
+                "--width", "0.08",
+                "--height", "0.08",
+                "-o", "output.png"
+            ]
+        },
+        {
+            "name": "Generate (DEM only, no imagery)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "world_topo",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--lat", "40.511",
+                "--lon", "-112.258",
+                "--width", "0.08",
+                "--height", "0.08",
+                "--no-imagery",
+                "--clean",
+                "-o", "output.png"
+            ]
+        }
+    ]
+}
