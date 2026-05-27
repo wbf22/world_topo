@@ -5,12 +5,12 @@ import tempfile
 import numpy as np
 import rasterio
 from matplotlib import rcParams, pyplot as plt
-from matplotlib.colors import Normalize
 
 from world_topo.fetch.dem import fetch_dem
 from world_topo.fetch.imagery import fetch_imagery
 from world_topo.render.hillshade import compute_hillshade
 from world_topo.render.contours import add_contours
+from world_topo.render.colormap import color_elevation_map
 
 rcParams['figure.dpi'] = 150
 
@@ -61,7 +61,6 @@ def make_elevation_map(lat, lon, width, height, output,
         figsize = (12, 12 * aspect_ratio)
         fig, ax = plt.subplots(1, 1, figsize=figsize)
 
-        # --- Render base: satellite imagery underlay ---
         if imagery_path and os.path.exists(imagery_path):
             with rasterio.open(imagery_path) as src:
                 if src.count >= 3:
@@ -79,33 +78,13 @@ def make_elevation_map(lat, lon, width, height, output,
                     ax.imshow(np.transpose(rgb, (1, 2, 0)),
                               extent=img_extent, alpha=0.9)
 
-        # --- Render middle: terrain elevation + hillshade composite ---
         shade = compute_hillshade(dem)
+        shade_alpha = 0.35 if imagery_path else 0.85
+        ax.imshow(shade, extent=extent, cmap='gray', alpha=shade_alpha)
 
-        norm = Normalize(vmin=-500, vmax=9000)
-        colors = plt.cm.terrain(norm(dem))
-
-        nan_mask = np.isnan(dem)
-        if nan_mask.any():
-            colors[nan_mask] = (0, 0, 0, 0)
-
-        shade_stack = np.stack(
-            [shade, shade, shade, np.ones_like(shade)], axis=2,
-        )
-        colors *= shade_stack
-
-        composite_alpha = 0.55 if imagery_path else 1.0
-        ax.imshow(colors, extent=extent, alpha=composite_alpha)
-
-        if not clean:
-            sm = plt.cm.ScalarMappable(norm=norm, cmap='terrain')
-            sm.set_array([])
-            plt.colorbar(sm, ax=ax, label='Elevation (m)', shrink=0.8)
-
-        # --- Render top: contour lines ---
+        color_elevation_map(ax, dem, extent, alpha=0.35, colorbar=not clean)
         add_contours(ax, dem, extent, interval=contour_interval)
 
-        # --- Labels & output ---
         if clean:
             ax.axis('off')
             plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
@@ -117,7 +96,6 @@ def make_elevation_map(lat, lon, width, height, output,
             ax.set_title(f'Elevation Map ({center_lat:.4f}°, {center_lon:.4f}°)')
             plt.tight_layout()
 
-        # --- Debug: save individual layers ---
         if debug:
             fig_dem, ax_dem = plt.subplots(1, 1, figsize=figsize)
             ax_dem.imshow(dem, extent=extent, cmap='terrain',
