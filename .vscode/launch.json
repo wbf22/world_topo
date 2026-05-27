@@ -9,11 +9,16 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "--lat", "46.85",
-                "--lon", "-121.76",
-                "--width", "0.08",
-                "--height", "0.08",
-                "-o", "output.png"
+                "--lat",
+                "46.85",
+                "--lon",
+                "-121.76",
+                "--width",
+                "0.08",
+                "--height",
+                "0.08",
+                "-o",
+                "output.png"
             ]
         },
         {
@@ -24,14 +29,36 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
+                "--lat",
+                "40.511",
+                "--lon",
+                "-112.258",
+                "--width",
+                "0.5",
+                "--height",
+                "0.5",
+                "--no-imagery",
+                "--clean",
+                "-o",
+                "output.png"
+            ]
+        },
+        {
+            "name": "World Topo",
+            "type": "debugpy",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "program": "world_topo.py",
+            "args": [
                 "--lat", "40.511",
                 "--lon", "-112.258",
-                "--width", "0.5",
-                "--height", "0.5",
+                "--width", "0.3",
+                "--height", "0.3",
                 "--no-imagery",
                 "--clean",
                 "-o", "output.png"
             ]
         }
+        
     ]
 }
